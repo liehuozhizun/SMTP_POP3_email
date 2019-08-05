@@ -1,6 +1,6 @@
-# HTTP-email
+# POP3-email
 ## Project Description
-* This project is trying to develop an email service with basic functionalities implemented based on the basic HTTP client-server model and multi-threading thinking. All functionalities are implemented by ourselves, including the HTTP protocol.  
+* This project is trying to develop an email service with basic functionalities implemented based on the basic POP3 client-server model and multi-threading thinking. All functionalities are implemented by ourselves, including the standard POP3 protocol.  
 * This project is a cooperative one completely developed and managed by Yujia Li and Hang Yuan.  
 * In order to lower down the level of difficulties of implementation, we designed and modified some specific protocols. More details can be found in our design doc.  
 
@@ -9,4 +9,4 @@
 **Hang Yuan** (hyuan211@gmail.com)
 
 ## Major Progress Update
-* Project Start -- 7/29/2019  
+* Project Start -- 08/01/2019  
