@@ -1,6 +1,6 @@
-# POP3-email
+# SMTP_POP3_email
 ## Project Description
-* This project is trying to develop an email service with basic functionalities implemented based on the basic POP3 client-server model and multi-threading thinking. All functionalities are implemented by ourselves, including the standard POP3 protocol.  
+* This project is trying to develop an email service with basic functionalities implemented based on the basic SMTP POP3 client-server model and multi-threading thinking. All functionalities are implemented by ourselves, including the standard SMTP POP3 protocol.  
 * This project is a cooperative one completely developed and managed by Yujia Li and Hang Yuan.  
 * In order to lower down the level of difficulties of implementation, we designed and modified some specific protocols. More details can be found in our design doc.  
 
