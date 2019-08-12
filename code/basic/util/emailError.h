@@ -10,8 +10,10 @@
 
 #define SUCCESS 0
 
+typedef int RC;
+
 enum {
-  OPEN_FAILED = 100,
+  OPEN_FAILED = 101,
   REMOVE_FAILED,
   SEEK_FAILED,
   READ_FAILED,
@@ -19,7 +21,7 @@ enum {
 };
 
 enum {
-  MALLOC_FAILED = 200,
+  MALLOC_FAILED = 201,
 };
 
 #endif /* emailError.h */
