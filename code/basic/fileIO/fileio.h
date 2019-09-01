@@ -3,37 +3,35 @@
 
 // #include <cstio>
 #include <string>
-// #include <climits>
-
-// Support directory manipulation
-// #include <cstdint>
-// #include <filesystem>
-// #include <boost/filesystem.hpp>
-// #include <direct.h>
-
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+// #include "../util/systemLog.h"
+#include "../util/emailError.h"
 using namespace std;
 
 // Define macros
 enum {
-  CREATE_FILE_ERROR
-  CREATE_DIR_ERROR
-  DESTORY_FILE_ERROR
-  DESTORY_DIR_ERROR
-  OPEN_ERROR
-  WRITE_ERROR
-  READ_ERROR
-  APPEND_ERROR
-  FILE_EXISTS
-  FILE_NOT_EXISTS
-  DIR_EXISTS
-  DIR_NOT_EXISTS
-  DIR_WRONG_PATH
-  FILE_DESCIPTOR_IN_USE
-  FILE_DESCIPTOR_NOT_EXISTS
-  FH_SEEK_FAILED
-}
+  CREATE_FILE_ERROR,
+  CREATE_DIR_ERROR,
+  DESTROY_FILE_ERROR,
+  DESTROY_DIR_ERROR,
+  OPEN_ERROR,
+  WRITE_ERROR,
+  READ_ERROR,
+  APPEND_ERROR,
+  FILE_EXISTS,
+  FILE_NOT_EXISTS,
+  DIR_EXISTS,
+  DIR_NOT_EXISTS,
+  DIR_WRONG_PATH,
+  FILE_DESCIPTOR_IN_USE,
+  FILE_DESCIPTOR_NOT_EXISTS,
+  FH_SEEK_FAILED,
+};
 
-#define ONY_BYTE 1
+#define ZERO     0
+#define ONE_BYTE 1
 
 /**
  * FileIO
@@ -45,7 +43,7 @@ enum {
  *   RC DestroyFile (const string &fileName)
  *   RC DestroyDir  (const string &dirName)
  *   RC OpenFile    (const string &fileName)
- *   RC CloseFile   (const string &fileName)
+ *   RC CloseFile   ()
  *   RC ResetFile   (const string &fileName)
  *   RC ResetDir    (const string &dirName)
  *   RC WriteFile   (size_t offset, size_t length, const void *data)
@@ -110,11 +108,10 @@ public:
 
   /**
    * This function will close the file descriptor _fd
-   * @param  const string given as the filename
    * @return SUCCESS if the _fd is successfully closed
    *         OPEN_ERROR if _fd cannot be closed
    */
-  RC CloseFile   (const string &fileName);
+  RC CloseFile   ();
 
   /**
    * This function will reset the file that already exists with the given filename.
@@ -170,17 +167,17 @@ public:
   RC AppendFile  (size_t length, const void *data);
 
 protected:
-  FileIO() {};   // Constructor
-  ~FileIO() {};  // Destructor
+  FileIO()  {};   // Constructor
+  ~FileIO() {};   // Destructor
 
 private:
   FILE *_fd;                               // File descriptor, from <cstio>
-  static FileIO *_file_io;    // Pointer of this class
+  static FileIO *_file_io;                 // Pointer of this class
 
   // Private helper function
   void Setfd(FILE *fd) { _fd = fd;   };    // Set the current file descriptor
   FILE *Getfd()        { return _fd; };    // Get current file descriptor
   bool FileExists(const string &fileName); // Check if the file exists
-}
+};
 
 #endif

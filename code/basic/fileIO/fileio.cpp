@@ -10,21 +10,22 @@
 
 #include "fileio.h"
 
-FileIO* FileIO::_file_io = NULL;
+FileIO* FileIO::_file_io = ZERO;
 
 FileIO* FileIO::instance()
 {
-    if(!_file_io)
-        _file_io = new FileIO();
+  if(!_file_io)
+    _file_io = new FileIO();
 
-    return _file_io;
+  return _file_io;
 }
 
 RC FileIO::CreateFile  (const string &fileName)
 {
+  RC rc;
   // If the file already exists, error
   if ((rc = FileExists(fileName)))
-    return FILE_EXIST;
+    return FILE_EXISTS;
 
   // Attempt to open the file for writing
   FILE *pFile = fopen(fileName.c_str(), "wb");
@@ -37,79 +38,61 @@ RC FileIO::CreateFile  (const string &fileName)
 
 RC FileIO::CreateDir   (const string &dirName)
 {
-  // Create a path and check if the
-  boost::filesystem::path dir(dir_path);
-
-  // Check if the path is a directory
-  if (!boost::filesystem::is_directory(dir))
-    return DIR_WRONG_PATH;
-
-  // Check if the directory exists
-  if (boost::filesystem::exists(dir))
-    return DIR_EXISTS;
-
   // Create the directory
-	if(boost::filesystem::create_directories(dir)) {
-		return SUCCESS;
-	}
+	RC rc = mkdir(dirName.c_str(), 777);
+  if (rc == SUCCESS) {
+    return SUCCESS;
+  }
   return CREATE_DIR_ERROR;
 }
 
 RC FileIO::DestroyFile (const string &fileName)
 {
   // If file cannot be successfully removed, error
-  if (remove(fileName.c_str()) != 0)
+  if (remove(fileName.c_str()) != SUCCESS)
     return DESTROY_FILE_ERROR;
   return SUCCESS;
 }
 
 RC FileIO::DestroyDir  (const string &dirName)
 {
-  boost::filesystem::path dir(dirName);
-
-  // Check if the path is a directory
-  if (!boost::filesystem::is_directory(dir))
-    return DIR_WRONG_PATH;
-
-  // Check if the directory exists
-  if (!boost::filesystem::exists(dir))
-    return DIR_DN_EXISTS;
-
   // Remove the directory recursively
-  uintmax_t n = boost::filesystem::remove_all(dir/ dirName);
-  if (n == 0)
-    return DESTROY_DIR_ERROR;
+  RC rc = rmdir(dirName.c_str());
+  if (rc == SUCCESS) {
+    return SUCCESS;
+  }
+  return DESTROY_DIR_ERROR;
 }
 
 RC FileIO::OpenFile    (const string &fileName)
 {
   // If this class already has an open file, error
   if (Getfd() != NULL)
-      return FILE_DESCIPTOR_IN_USE;
+    return FILE_DESCIPTOR_IN_USE;
 
   // If the file doesn't exist, error
-  if (!fileExists(fileName.c_str()))
-      return FILE_NOT_EXISTS;
+  if (!FileExists(fileName.c_str()))
+    return FILE_NOT_EXISTS;
 
   // Open the file for reading/writing in binary mode
   FILE *pFile;
   pFile = fopen(fileName.c_str(), "rb+");
   // If we fail, error
   if (pFile == NULL)
-      return OPEN_ERROR;
+    return OPEN_ERROR;
 
   Setfd(pFile);
 
   return SUCCESS;
 }
 
-RC FileIO::CloseFile   (const string &fileName)
+RC FileIO::CloseFile   ()
 {
   FILE *pFile = Getfd();
 
   // If not an open file, ignore
   if (pFile == NULL)
-      return SUCCESS;
+    return SUCCESS;
 
   // Flush and close the file
   fclose(pFile);
@@ -142,18 +125,18 @@ RC FileIO::ResetDir    (const string &dirName)
 RC FileIO::WriteFile   (size_t offset, size_t length, const void *data)
 {
   if (_fd == NULL)
-      return FILE_DESCIPTOR_NOT_EXISTS;
+    return FILE_DESCIPTOR_NOT_EXISTS;
 
   // Seek to the start position in file
   if (fseek(_fd, offset, SEEK_SET))
-      return FH_SEEK_FAILED;
+    return FH_SEEK_FAILED;
 
   // Write the data
   if (fwrite(data, ONE_BYTE, length, _fd) == length)
   {
-      // Immediately commit changes to disk
-      fflush(_fd);
-      return SUCCESS;
+    // Immediately commit changes to disk
+    fflush(_fd);
+    return SUCCESS;
   }
 
   return WRITE_ERROR;
@@ -162,35 +145,34 @@ RC FileIO::WriteFile   (size_t offset, size_t length, const void *data)
 RC FileIO::ReadFile    (size_t offset, size_t length, void *data)
 {
   if (_fd == NULL)
-      return FILE_DESCIPTOR_NOT_EXISTS;
+    return FILE_DESCIPTOR_NOT_EXISTS;
 
   // Try to seek to the starting position in the file
-  if (fseek(_fd, PAGE_SIZE * pageNum, SEEK_SET))
-      return FH_SEEK_FAILED;
+  if (fseek(_fd, offset, SEEK_SET))
+    return FH_SEEK_FAILED;
 
   // Try to read the specified page
-  if (fread(data, 1, PAGE_SIZE, _fd) != PAGE_SIZE)
-      return READ_ERROR;
+  if (fread(data, ONE_BYTE, length, _fd) != length)
+    return READ_ERROR;
 
-  readPageCounter++;
   return SUCCESS;
 }
 
 RC FileIO::AppendFile  (size_t length, const void *data)
 {
   if (_fd == NULL)
-      return FILE_DESCIPTOR_NOT_EXISTS;
+    return FILE_DESCIPTOR_NOT_EXISTS;
 
   // Seek to the start position in file
-  if (fseek(_fd, offset, SEEK_END))
-      return FH_SEEK_FAILED;
+  if (fseek(_fd, ZERO, SEEK_END))
+    return FH_SEEK_FAILED;
 
   // Write the data
   if (fwrite(data, ONE_BYTE, length, _fd) == length)
   {
-      // Immediately commit changes to disk
-      fflush(_fd);
-      return SUCCESS;
+    // Immediately commit changes to disk
+    fflush(_fd);
+    return SUCCESS;
   }
 
   return APPEND_ERROR;
@@ -199,6 +181,6 @@ RC FileIO::AppendFile  (size_t length, const void *data)
 bool FileIO::FileExists  (const string &fileName)
 {
   // If stat fails, we can safely assume the file doesn't exist
-  struct stat sb;
-  return stat(fileName.c_str(), &sb) == 0;
+  struct stat file_status;
+  return stat(fileName.c_str(), &file_status) == SUCCESS;
 }

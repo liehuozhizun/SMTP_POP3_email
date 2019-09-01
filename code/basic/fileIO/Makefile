@@ -3,23 +3,21 @@ GPPWARN     = -Wall -Wextra -Wpedantic -Wshadow -Wold-style-cast
 GPPOPTS     = ${GPPWARN} -fdiagnostics-color=never
 COMPILECPP  = g++ -std=gnu++2a -g -O0 ${GPPOPTS}
 
-MODULES   = fileio
+MODULES   = fileio unit_test_fileio
 EXECBINS  = unit_test
-CPPHEADER = ${MODULES:=.h} ${EXECBINS:=.h}
-CPPSOURCE = $(MODULES:=.cpp) $(EXECBINS:=.cpp)
-OBJECTS   = $(CPPSOURCE:.cpp=.o)
-CLEANOBJS = $(OBJECTS) $(EXECBINS)
+CPPHEADER = ${MODULES:=.h      #${EXECBINS:=.h}
+CPPSOURCE = ${MODULES:=.cpp}   #${EXECBINS:=.cpp}
+OBJECTS   = ${CPPSOURCE:.cpp=.o}
+CLEANOBJS = ${OBJECTS} ${EXECBINS}
 
-$(EXECBINS): $(OBJECTS)
-	$(COMPILECPP) -o $@ $(OBJECTS)
+${EXECBINS}: ${OBJECTS}
+	${COMPILECPP} -o $@ ${OBJECTS}
 
 %.o: %.cpp
-	$(COMPILECPP) -c $<
+	${COMPILECPP} -c $<
 
-.PHONY: clean
 clean:
-	- rm $(OBJECTS)
+	- rm ${OBJECTS}
 
-.PHONY: cleanall
 cleanall:
-	-rm $(CLEANOBJS) *.log
+	-rm ${CLEANOBJS} *.log
