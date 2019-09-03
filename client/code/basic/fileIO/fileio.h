@@ -1,16 +1,18 @@
 #ifndef FILE_IO
 #define FILE_IO
 
+/* ----- Include libries or files ----- */
 // #include <cstio>
 #include <string>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-// #include "../util/systemLog.h"
-#include "../util/emailError.h"
+// #include "../../util/systemLog.h"
+#include "../../util/emailError.h"
+#include "../../util/util.h"
 using namespace std;
 
-// Define macros
+/* ----- Define macros ----- */
 enum {
   CREATE_FILE_ERROR,
   CREATE_DIR_ERROR,
@@ -38,6 +40,7 @@ enum {
  * This class contains all interfaces that will be used to manage the file.
  *
  * Contained Public Functions:
+ *   FileIO* instance ()
  *   RC CreateFile  (const string &fileName)
  *   RC CreateDir   (const string &dirName)
  *   RC DestroyFile (const string &fileName)
@@ -55,13 +58,8 @@ class FileIO
 {
 public:
   /**
-   * These function transitions between rooms. Each call should return SUCCESS if the current room has
-   * an exit in the correct direction and the new room was able to be loaded, and STANDARD_ERROR
-   * otherwise.
-   * @param title A character array to copy the room title into. Should be GAME_MAX_ROOM_TITLE_LENGTH+1
-   *             in length in order to allow for all possible titles to be copied into it.
-   * @return SUCCESS if the room CAN be navigated to and changing the current room to that new room
-   *         succeeded.
+   * This function will initialize an instance for FileIO
+   * @return pointer of FileIO
    */
   static FileIO* instance();
 

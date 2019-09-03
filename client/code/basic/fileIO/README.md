@@ -10,5 +10,8 @@ information of the system
 
 
 ## Major Progress Update
-* Module design  - 8/5/19  
-* Start coding   - 8/5/19  
+* Module design             - 8/5/19  
+* Start coding              - 8/5/19  
+* Basic implementation done - 8/11/19  
+* Change design and redo    - 8/31/19  
+* Wait for testing
