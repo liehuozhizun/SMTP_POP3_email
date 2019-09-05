@@ -17,8 +17,8 @@ typedef int RC;
 #define DF_EXTENSION   ".df"
 #define LOG_EXTENSION  ".log"
 
-enum {
+typedef enum {
   INFO = "INFO",
   WARN = "WARN",
   ERRO = "ERRO",
-};
+} LOGTYPE;

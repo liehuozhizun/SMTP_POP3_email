@@ -10,20 +10,13 @@
 
 #include "emailError.h"
 #include "time.h"
+#include "util.h"
 #include "../fileIO/fileio.h"
 
-RC CreateLogDir()
-{
-  string dirPath = "../../data/log";
-  return CreateDir(dirPath);
-}
+// System manager should check log directory when
+RC CreateLogDir();
 
-RC Logger(string logMsg)
-{
-    string filePath = "../../data/log/"+GetCurrentData()+".log";
-    string now = GetCurrentTime();
-    ofstream ofs(filePath.c_str(), std::ios_base::out | std::ios_base::app );
-    ofs << now << '\t' << logMsg << '\n';
-    ofs.close();
-}
+// This function **ASSUME** log directory exists.
+RC LOG(LOGTYPE type,string logMsg);
+
 #endif /* systemLog.h */
