@@ -3,8 +3,8 @@ GPPWARN     = -Wall -Wextra -Wpedantic -Wshadow -Wold-style-cast
 GPPOPTS     = ${GPPWARN} -fdiagnostics-color=never
 COMPILECPP  = g++ -std=gnu++2a -g -O0 ${GPPOPTS}
 
-MODULES   = uim unit_test_uim
-EXECBINS  = uim
+MODULES   = fileio unit_test_fileio
+EXECBINS  = unit_test
 CPPHEADER = ${MODULES:=.h      #${EXECBINS:=.h}
 CPPSOURCE = ${MODULES:=.cpp}   #${EXECBINS:=.cpp}
 OBJECTS   = ${CPPSOURCE:.cpp=.o}

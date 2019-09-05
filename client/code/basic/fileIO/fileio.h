@@ -69,7 +69,7 @@ public:
    * @return SUCCESS if the file is successfully created.
    *         CREATE_ERROR if create file not successfully.
    */
-  RC CreateFile  (const string &fileName);
+  RC CreateFile  (const std::string &fileName);
 
   /**
    * This function will create a new directory in the data folder.
@@ -77,7 +77,7 @@ public:
    * @return SUCCESS if the directory is successfully created.
    *         CREATE_ERROR if create directory not successfully.
    */
-  RC CreateDir   (const string &dirname);
+  RC CreateDir   (const std::string &dirname);
 
   /**
    * This function will remove a file with the given filename.
@@ -85,7 +85,7 @@ public:
    * @return SUCCESS if the file has been removed successfully.
    *         DESTROY_ERROR if failed to remove.
    */
-  RC DestroyFile (const string &fileName);
+  RC DestroyFile (const std::string &fileName);
 
   /**
    * This function will remove a directory with the given directory name.
@@ -93,7 +93,7 @@ public:
    * @return SUCCESS if the directory has been removed successfully.
    *         DESTROY_ERROR if failed to remove.
    */
-  RC DestroyDir  (const string &dirName);
+  RC DestroyDir  (const std::string &dirName);
 
   /**
    * This function will open a file with the given filename or path to open the
@@ -102,7 +102,7 @@ public:
    * @return SUCCESS if the file is successfully opened.
    *         OPEN_ERROR if file cannot be opened.
    */
-  RC OpenFile    (const string &fileName);
+  RC OpenFile    (const std::string &fileName);
 
   /**
    * This function will close the file descriptor _fd.
@@ -118,7 +118,7 @@ public:
    * @return SUCCESS if destory and create successfully.
    *         pre-defined error number returned by other functions.
    */
-  RC ResetFile   (const string &fileName);
+  RC ResetFile   (const std::string &fileName);
 
   /**
    * This function will reset the directory that already exists with the given name.
@@ -127,7 +127,7 @@ public:
    * @return SUCCESS if destory and create successfully.
    *         pre-defined error number returned by other functions.
    */
-  RC ResetDir    (const string &dirName);
+  RC ResetDir    (const std::string &dirName);
 
   /**
    * This function will append(write) the fixed-length data from the given pointer
@@ -178,7 +178,7 @@ private:
   // Private helper function
   void Setfd(FILE *fd) { _fd = fd;   };    // Set the current file descriptor
   FILE *Getfd()        { return _fd; };    // Get current file descriptor
-  bool FileExists(const string &fileName); // Check if the file exists
+  bool FileExists(const std::string &fileName); // Check if the file exists
 };
 
 #endif

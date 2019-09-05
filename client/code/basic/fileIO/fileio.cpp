@@ -20,7 +20,7 @@ FileIO* FileIO::instance()
   return _file_io;
 }
 
-RC FileIO::CreateFile  (const string &fileName)
+RC FileIO::CreateFile  (const std::string &fileName)
 {
   RC rc;
   // If the file already exists, error
@@ -36,7 +36,7 @@ RC FileIO::CreateFile  (const string &fileName)
   return SUCCESS;
 }
 
-RC FileIO::CreateDir   (const string &dirName)
+RC FileIO::CreateDir   (const std::string &dirName)
 {
   // Create the directory
 	RC rc = mkdir(dirName.c_str(), 777);
@@ -46,7 +46,7 @@ RC FileIO::CreateDir   (const string &dirName)
   return CREATE_DIR_ERROR;
 }
 
-RC FileIO::DestroyFile (const string &fileName)
+RC FileIO::DestroyFile (const std::string &fileName)
 {
   // If file cannot be successfully removed, error
   if (remove(fileName.c_str()) != SUCCESS)
@@ -54,7 +54,7 @@ RC FileIO::DestroyFile (const string &fileName)
   return SUCCESS;
 }
 
-RC FileIO::DestroyDir  (const string &dirName)
+RC FileIO::DestroyDir  (const std::string &dirName)
 {
   // Remove the directory recursively
   RC rc = rmdir(dirName.c_str());
@@ -64,7 +64,7 @@ RC FileIO::DestroyDir  (const string &dirName)
   return DESTROY_DIR_ERROR;
 }
 
-RC FileIO::OpenFile    (const string &fileName)
+RC FileIO::OpenFile    (const std::string &fileName)
 {
   // If this class already has an open file, error
   if (Getfd() != NULL)
@@ -102,7 +102,7 @@ RC FileIO::CloseFile   ()
   return SUCCESS;
 }
 
-RC FileIO::ResetFile   (const string &fileName)
+RC FileIO::ResetFile   (const std::string &fileName)
 {
   RC rc;
   if ((rc = DestroyFile(fileName)))
@@ -112,7 +112,7 @@ RC FileIO::ResetFile   (const string &fileName)
     return rc;
 }
 
-RC FileIO::ResetDir    (const string &dirName)
+RC FileIO::ResetDir    (const std::string &dirName)
 {
   RC rc;
   if ((rc = DestroyDir(dirName)))
@@ -178,7 +178,7 @@ RC FileIO::AppendFile  (size_t length, const void *data)
   return APPEND_ERROR;
 }
 
-unsigned FilIO::GetFileSize ()
+unsigned FileIO::GetFileSize ()
 {
   if (_fd == NULL)
     return ZERO;
@@ -192,7 +192,7 @@ unsigned FilIO::GetFileSize ()
   return size;
 }
 
-bool FileIO::FileExists  (const string &fileName)
+bool FileIO::FileExists  (const std::string &fileName)
 {
   // If stat fails, we can safely assume the file doesn't exist
   struct stat file_status;
