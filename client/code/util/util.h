@@ -16,3 +16,9 @@ typedef int RC;
 #define DATA_EXTENSION ".data"
 #define DF_EXTENSION   ".df"
 #define LOG_EXTENSION  ".log"
+
+enum {
+  INFO = "INFO",
+  WARN = "WARN",
+  ERRO = "ERRO",
+};

@@ -178,6 +178,20 @@ RC FileIO::AppendFile  (size_t length, const void *data)
   return APPEND_ERROR;
 }
 
+unsigned FilIO::GetFileSize ()
+{
+  if (_fd == NULL)
+    return ZERO;
+
+  // Obatin the size of the file
+  fpos_t pos;
+  fgetpos(_fd, &pos);
+  fseek(_fd, ZERO, SEEK_END);
+  unsigned size = ftell(_fd);
+  fsetpos(_fd, &pos);
+  return size;
+}
+
 bool FileIO::FileExists  (const string &fileName)
 {
   // If stat fails, we can safely assume the file doesn't exist

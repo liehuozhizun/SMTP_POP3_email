@@ -24,22 +24,37 @@ enum {
 
 #define ZERO     0
 #define ONE_BYTE 1
+#define USER_ACCOUNT_MAX_LANGTH 30
+#define USERNAME_MAX_LANGTH     15
+#define DOMAIN_NAME_MAX_LENGTH  15
+#define PASSWORD_MAX_LENGTH     16
+#define LOG_MESSAGE_MAX_LENGTH  80
+#define USER_FILE_PATH "../../../data/user.sys"
+#define CREATE_SUCC_LOG_PROMPT "[UIM] create user success, user: %s"
+#define CREATE_FAIL_LOG_PROMPT "[UIM] create user fail, user: %s, reason: %s"
+#define REMOVE_SUCC_LOG_PROMPT "[UIM] remove user success, user: %s"
+#define REMOVE_FAIL_LOG_PROMPT "[UIM] remove user fail, user: %s, reason: %s"
+#define READ_SUCC_LOG_PROMPT "[UIM] read user success, user: %s"
+#define READ_FAIL_LOG_PROMOT "[UIM] read user fail, user: %s, reason: %s"
+#define LOGIN_LOG_PROMOT "[UIM] user login success: %s"
+#define LOGOUT_LOG_PROMOT "[UIM] user logout success: %s"
 
 /* ----- Define structs ----- */
+struct CientUserInfoHeader {
+  unsigned totalUserNumber;
+};
+
 struct ClientUserInfo {
-  string username;
-  string domainName;
-  time_t lastLoginTime;
-  time_t lastLogoutTime;
+  char userAccount[USER_ACCOUNT_MAX_LANGTH];  // Example: user@example.com
 };
 
 struct ServerUserInfo {
-  string username;
-  string domainName;
-  string password;
+  char username  [USERNAME_MAX_LANGTH];      // Example: user
+  char domainName[DOMAIN_NAME_MAX_LENGTH];   // Example: @example.com
+  char password  [PASSWORD_MAX_LENGTH];      // Example: 1a2b3c4d
   time_t lastLoginTime;
   time_t lastLogoutTime;
-  time_t changeTimestamp;
+  bool changeStatus;     // True: changed, False: no change
 };
 
 /**
@@ -48,20 +63,11 @@ struct ServerUserInfo {
  *
  * Contained Public Functions:
  *   UIM* instance ()
- *   RC CheckExist (const string &userAccount)
- *   RC CreateUser (const ServerUserInfo &userInfo)
- *   RC CloseUser  (const string &userAccount)
+ *   RC CreateUser (const string &userAccount)
+ *   RC RemoveUser (const string &userAccount)
  *   RC ReadUser   (const string &userAccount, ClientUserInfo &userInfo)
- *   RC UpdateUser (const ServerUserInfo &userInfo)
- *   RC SetupUser  (const string &userAccount)
- *   RC Login      (const ServerUserInfo &userInfo)
+ *   RC Login      (const string &userAccount)
  *   RC Logout     (const string &userAccount)
- *
- * Private Functions:
- *   RC UserAccountGenerator (const ServerUserInfo &userInfo, string &userAccount)
- *   RC UserAccountGenerator (const ClientUserInfo &userInfo, string &userAccount)
- *   RC ClientUserInfoGenerator (const string &userAccount, ClientUserInfo &userInfo)
- *   RC ServerUserInfoGenerator (const string &userAccount, ServerUserInfo &userInfo)
  */
 
 class UIM
@@ -74,117 +80,86 @@ public:
   static UIM* instance();
 
   /**
-   * This function will check if the given user account exists in server's database.
-   * @param string as the given username@domain. E.g., admin@sample.com.
-   * @return SUCCESS if the username exists in the server's database.
-   *         USER_EXISTS if the user exists in server's database.
-   *         STANDARD_ERROR otherwise.
-   */
-  RC CheckExist (const string &userAccount);
-
-  /**
-   * This function will create a new user account both locally and remotely.
+   * This function will create a new user account locally. If the user already
+   * exists, do nothing.
    * @param ServerUserInfo contains all the information needed to create a user.
-   * @return SUCCESS if create a new user successfully.
+   * @return SUCCESS if create a new user successfully or the user already exists.
    *         CREATE_USER_ERROR if fail to create.
    *         STANDARD_ERROR otherwise.
    */
-  RC CreateUser (const ServerUserInfo &userinfo);
+  RC CreateUser (const userAccount, const ClientUserInfo &userinfo);
 
   /**
-   * This function close a user's account by removing all information of this user
-   * locally and remotely.
+   * This function remove a user's account info from the user system.
    * @param string as the given username@domain. E.g., admin@sample.com.
    * @return SUCCESS if the user has been successfully removed.
    *         USER_NOT_EXISTS if the user doesn't exist in server's database.
    *         STANDARD_ERROR otherwise.
    */
-  RC CloseUser  (const string &userAccount);
+  RC RemoveUser (const string &userAccount);
 
   /**
-   * This function read user info from the user.sys file.
+   * This function read the specific user info given the userAccount.
    * @param string as the given username@domain. E.g., admin@sample.com.
-   *        ClientUserInfo to store the returned user information.
-   * @return SUCCESS if the user info is successfully read.
-   *         USER_NOT_EXISTS if the user doesn't exist.
-   *         READ_USER_ERROR otherwise.
+   *        ClientUserInfo to store the user info.
+   * @return SUCCESS if the user has been successfully read.
+   *         USER_NOT_EXISTS if the user doesn't exist in server's database.
+   *         STANDARD_ERROR otherwise.
    */
   RC ReadUser   (const string &userAccount, ClientUserInfo &userInfo);
 
   /**
-   * This function will update the user's information locally and remotely.
-   * @param ServerUserInfo contains all information needed to be updated.
-   * @return SUCCESS if update successfully.
-   *         STANDARD_ERROR otherwise.
-   */
-  RC UpdateUser (const ServerUserInfo &userInfo);
-
-  /**
-   * This function will try to obtain the user's information from the server's
-   * database. If the user's info system file doesn't exist, create it first.
+   * This function will store the login info into the log file.
    * @param string as the given username@domain. E.g., admin@sample.com.
-   * @return SUCCESS if the user has been successfully setup.
+   * @return SUCCESS if store log successfully.
    *         STANDARD_ERROR otherwise.
    */
-  RC SetupUser  (const string &userAccount);
+  RC Login      (const string &userAccount);
 
   /**
-   * This function will login the user with given password and verify it with the
-   * help of server's interface. Login will SetupUser.
-   * @param ServerUserInfo contains all the information needed to login the account.
-   * @return SUCCESS if the user has successfullt logined and been set up.
-   *         PASSWORD_ERROR if the password is mismatched with the record in server.
-   *         USER_NOT_EXISTS if the user doesn't exist in server.
-   *         STANDARD_ERROR otherwise.
-   */
-  RC Login      (const ServerUserInfo &userInfo);
-
-  /**
-   * This function will logout your account from the current system and send your
-   * logout action to server.
+   * This function will store the logout info into the log file.
    * @param string as the given username@domain. E.g., admin@sample.com.
-   * @return SUCCESS if logout successfully.
+   * @return SUCCESS if store log successfully.
    *         STANDARD_ERROR otherwise.
    */
   RC Logout     (const string &userAccount);
 
 protected:
-  UIM() {};    // Constructor
+  UIM();       // Constructor
   ~UIM() {};   // Destructor
 
 private:
-  static UIM *_uim;   // Pointer of this class
+  static UIM *_uim;    // Pointer of this class
+  static FileIO *_fio; // Pointer of FileIO class
+
+  unsigned _totalUserNumber;
 
   // Private helper functions
   /**
-   * These functions will translate the UserInfo to a userAccount.
-   * @param ServerUserInfo/ClientUserInfo contain the given information.
-   *        string to store the userAccount.
-   * @return SUCCESS if translate successfully.
-   *         STANDARD_ERROR otherwise.
+   * This function will read the file header and save the totalUserNumber.
    */
-  RC UserAccountGenerator_S (const ServerUserInfo &userInfo, string &userAccount);
-  RC UserAccountGenerator_C (const ClientUserInfo &userInfo, string &userAccount);
+  void GetUserNumber ();
 
   /**
-   * These functions will generate a half-empty UserInfo with given userAccount
+   * This function will set totalUserNumber back to the user sys file header.
+   */
+  void SetUserNumber ();
+
+  /**
+   * This function will traverse the user system file to look for a userAccount.
    * @param string as the given username@domain. E.g., admin@sample.com.
-   *        ServerUserInfo/ClientUserInfo contain the given information.
-   * @return SUCCESS if translate successfully
-   *         STANDARD_ERROR otherwise;
+   * @return unsigned as the offset of the user in the user system file.
+   *         0(ZERO) if not find.
    */
-  RC ClientUserInfoGenerator (const string &userAccount, ClientUserInfo &userInfo);
-  RC ServerUserInfoGenerator (const string &userAccount, ServerUserInfo &userInfo);
+  unsigned CheckUserExistence (const string &userAccount);
 
   /**
-   * These function will translate UserInfo from the other type
-   * @param ServerUserInfo/ClientUserInfo contains the given information.
-   *        ClientUserInfo/ServerUserInfo to store translation.
-   * @return SUCCESS if translate successfully
-   *         STANDARD_ERROR otherwise;
+   * This function will check if there is empty space to add new user.
+   * @return unsigned as the availiable position if there is enough space.
+   *         0(ZERO) if there is not enough space.
    */
-  RC UserInfo_StoC (const ServerUserInfo &userInfo, ClientUserInfo & C_userInfo);
-  RC UserInfo_CtoS (const ClientUserInfo &userInfo, ServerUserInfo & S_userInfo);
+  unsigned CheckEmptySpace ();
+
 };
 
 #endif
