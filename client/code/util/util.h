@@ -6,6 +6,9 @@
  * Author: Yujia Li(liyj070707@gmail.com), Hang Yuan(hyuan211@gmail.com)
  */
 
+#ifndef UTIL_H
+#define UTIL_H
+
 typedef int RC;
 
 #define SUCCESS        0
@@ -17,8 +20,4 @@ typedef int RC;
 #define DF_EXTENSION   ".df"
 #define LOG_EXTENSION  ".log"
 
-typedef enum {
-  INFO = "INFO",
-  WARN = "WARN",
-  ERRO = "ERRO",
-} LOGTYPE;
+#endif
