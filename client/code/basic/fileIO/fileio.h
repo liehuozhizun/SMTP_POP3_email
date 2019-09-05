@@ -10,7 +10,6 @@
 // #include "../../util/systemLog.h"
 #include "../../util/emailError.h"
 #include "../../util/util.h"
-using namespace std;
 
 /* ----- Define macros ----- */
 enum {
