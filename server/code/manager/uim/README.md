@@ -12,3 +12,4 @@ client and all users on remote server
 ## Major Progress Update
 * Module design  - 9/2/19  
 * Start coding   - 9/2/19  
+* Redesign       - 9/5/19
