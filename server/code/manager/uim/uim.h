@@ -1,7 +1,8 @@
-#ifndef UIM
-#define UIM
+#ifndef USER_INFO_MANAGER
+#define USER_INFO_MANAGER
 
 /* ----- Include libries or files ----- */
+#include <cstring>
 #include <stdlib.h>
 #include <string>
 #include <time.h>
@@ -22,7 +23,7 @@ enum {
 #define DOMAIN_NAME_MAX_LENGTH    15
 #define PASSWORD_MAX_LENGTH       16
 #define USER_FILE_PATH_MAX_LENGTH 40 // DATAPATH(14)+domainName(15)+(10)+extra(1)
-#define USER_FILE_PATH_FORMAT "%s%s/user.data" // DATAPATH/domainName/user.data
+const char USER_FILE_PATH_FORMAT[] = "%s%s/user.data"; // DATAPATH/domainName/user.data
 
 /* ----- Define structs ----- */
 struct UserInfoHeader {
@@ -38,11 +39,11 @@ struct UserInfo {
 };
 
 /**
- * UIM (User Info Manager)
+ * UserInfoManager
  * This class contains all interfaces that will be used to manage the user info.
  *
  * Contained Public Functions:
- *   UIM* instance ()
+ *   UserInfoManager* instance ()
  *   RC CreateUser (const UserInfo &userInfo)
  *   RC CloseUser  (const UserInfo &userInfo)
  *   RC ReadUser   (UserInfo &userInfo)
@@ -51,14 +52,14 @@ struct UserInfo {
  *   RC Logout     (const UserInfo &userInfo)
  */
 
-class UIM
+class UserInfoManager
 {
 public:
   /**
-   * This function will initialize an instance for UIM
-   * @return pointer of UIM
+   * This function will initialize an instance for UserInfoManager
+   * @return pointer of UserInfoManager
    */
-  static UIM* instance();
+  static UserInfoManager* instance();
 
   /**
    * This function will create a new user account in the database. If the user
@@ -117,11 +118,11 @@ public:
   RC Logout     (const UserInfo &userInfo);
 
 protected:
-  UIM() {};    // Constructor
-  ~UIM() {};   // Destructor
+  UserInfoManager();      // Constructor
+  ~UserInfoManager() {};  // Destructor
 
 private:
-  static UIM *_uim;    // Pointer of this class
+  static UserInfoManager *_uim;    // Pointer of this class
   static FileIO *_fio; // Pointer of FileIO class
 
   unsigned _totalUserNumber;

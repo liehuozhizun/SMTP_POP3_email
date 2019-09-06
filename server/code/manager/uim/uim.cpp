@@ -10,17 +10,23 @@
 
 #include "uim.h"
 
-UIM* UIM::_uim = NULL;
-FileIO* FileIO::_fio = NULL;
+UserInfoManager* UserInfoManager::_uim = NULL;
+FileIO* UserInfoManager::_fio = NULL;
 
-UIM* UIM::instance()
+UserInfoManager::UserInfoManager()
+{
+  // Initialize the internal FileIO instance
+  _fio = FileIO::instance();
+}
+
+UserInfoManager* UserInfoManager::instance()
 {
   if(!_uim)
-    _uim = new UIM();
+    _uim = new UserInfoManager();
   return _uim;
 }
 
-RC UIM::CreateUser (const UserInfo &userInfo)
+RC UserInfoManager::CreateUser (const UserInfo &userInfo)
 {
   RC rc;
 
@@ -44,12 +50,12 @@ RC UIM::CreateUser (const UserInfo &userInfo)
 
   // Increase the header by ONE
   ++_totalUserNumber;
-  SetUserNumber;
+  SetUserNumber();
 
   return SUCCESS;
 }
 
-RC UIM::CloseUser  (const UserInfo &userInfo)
+RC UserInfoManager::CloseUser  (const UserInfo &userInfo)
 {
   RC rc;
 
@@ -61,13 +67,18 @@ RC UIM::CloseUser  (const UserInfo &userInfo)
   if (offset) { // true(not ZERO) means found the user
     // Move the following user info towards ahead to cover the one need to be closed
     unsigned moveBlockSize = sizeof(UserInfoHeader) + (_totalUserNumber - ONE) * sizeof(UserInfo);
-    char moveBlock[moveBlockSize];
+    void* moveBlock = malloc(moveBlockSize);
     rc = _fio->ReadFile(offset + sizeof(UserInfo), moveBlockSize, moveBlock);
-    if (rc)
+    if (rc) {
+      free(moveBlock);
       return STANDARD_ERROR;
+    }
     rc = _fio->WriteFile(offset, moveBlockSize, moveBlock);
-    if (rc)
+    if (rc) {
+      free(moveBlock);
       return STANDARD_ERROR;
+    }
+    free(moveBlock);
 
     // Increase the totalUserNumber in the header
     ++_totalUserNumber;
@@ -79,7 +90,7 @@ RC UIM::CloseUser  (const UserInfo &userInfo)
   return SUCCESS;
 }
 
-RC UIM::UpdateUser (const UserInfo &userInfo)
+RC UserInfoManager::UpdateUser (const UserInfo &userInfo)
 {
   RC rc;
 
@@ -97,7 +108,7 @@ RC UIM::UpdateUser (const UserInfo &userInfo)
   return SUCCESS;
 }
 
-RC UIM::ReadUser   (UserInfo &userInfo)
+RC UserInfoManager::ReadUser   (UserInfo &userInfo)
 {
   RC rc;
 
@@ -115,7 +126,7 @@ RC UIM::ReadUser   (UserInfo &userInfo)
   return SUCCESS;
 }
 
-RC UIM::Login      (const UserInfo &userInfo)
+RC UserInfoManager::Login      (const UserInfo &userInfo)
 {
   RC rc;
 
@@ -147,7 +158,7 @@ RC UIM::Login      (const UserInfo &userInfo)
   return SUCCESS;
 }
 
-RC UIM::Logout     (const UserInfo &userInfo)
+RC UserInfoManager::Logout     (const UserInfo &userInfo)
 {
   RC rc;
 
@@ -172,22 +183,22 @@ RC UIM::Logout     (const UserInfo &userInfo)
 }
 
 /************ Helper Functions *************/
-void UIM::GetUserNumber ()
+void UserInfoManager::GetUserNumber ()
 {
   UserInfoHeader header;
   _fio->ReadFile(ZERO, sizeof(UserInfoHeader), &header);
   _totalUserNumber = header.totalUserNumber;
 }
 
-void UIM::SetUserNumber ()
+void UserInfoManager::SetUserNumber ()
 {
-  CientUserInfoHeader header;
-  _fio->ReadFile(ZERO, sizeof(CientUserInfoHeader), &header);
+  UserInfoHeader header;
+  _fio->ReadFile(ZERO, sizeof(UserInfoHeader), &header);
   header.totalUserNumber = _totalUserNumber;
-  _fio->WriteFile(ZERO, sizeof(CientUserInfoHeader), &header);
+  _fio->WriteFile(ZERO, sizeof(UserInfoHeader), &header);
 }
 
-unsigned UIM::ObatinUserOffset (const UserInfo &userInfo)
+unsigned UserInfoManager::ObatinUserOffset (const UserInfo &userInfo)
 {
   unsigned offset = sizeof(UserInfoHeader);
   UserInfo compare_userInfo;
@@ -203,7 +214,7 @@ unsigned UIM::ObatinUserOffset (const UserInfo &userInfo)
   return ZERO;
 }
 
-unsigned UIM::CheckEmptySpace ()
+unsigned UserInfoManager::CheckEmptySpace ()
 {
   unsigned fileSize = _fio->GetFileSize();
   unsigned usedSpace = sizeof(UserInfoHeader) + sizeof(UserInfo) * _totalUserNumber;
@@ -213,13 +224,13 @@ unsigned UIM::CheckEmptySpace ()
     return ZERO;
 }
 
-RC UIM::SetUserFilePath (const UserInfo &userInfo)
+RC UserInfoManager::SetUserFilePath (const UserInfo &userInfo)
 {
   RC rc;
 
   // Generate the file path
-  char dataPath[] = calloc(USER_FILE_PATH_MAX_LENGTH, sizeof(char));
-  sprintf(dataPath, DATAPATH, userInfo.domainName);
+  char* dataPath = static_cast<char *>(calloc(USER_FILE_PATH_MAX_LENGTH, sizeof(char)));
+  sprintf(dataPath, USER_FILE_PATH_FORMAT, DATAPATH, userInfo.domainName);
   std::string path = std::string(dataPath);
   free(dataPath);
 
@@ -243,7 +254,7 @@ RC UIM::SetUserFilePath (const UserInfo &userInfo)
     // Add the UserInfoHeader
     UserInfoHeader header;
     header.totalUserNumber = ZERO;
-    SetUserNumber();
+    _fio->AppendFile(sizeof(UserInfoHeader), &header);
   }
 
   GetUserNumber();

@@ -10,7 +10,7 @@
 
 #include "fileio.h"
 
-FileIO* FileIO::_file_io = ZERO;
+FileIO* FileIO::_file_io = NULL;
 
 FileIO* FileIO::instance()
 {

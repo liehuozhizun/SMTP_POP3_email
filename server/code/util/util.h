@@ -13,11 +13,12 @@ typedef int RC;
 
 #define SUCCESS        0
 #define STANDARD_ERROR -1
-#define DATAPATH       "../../../data/"
 
 #define SYS_EXTENSION  ".sys"
 #define DATA_EXTENSION ".data"
 #define DF_EXTENSION   ".df"
 #define LOG_EXTENSION  ".log"
+
+const char DATAPATH[] = "../../../data/";
 
 #endif
