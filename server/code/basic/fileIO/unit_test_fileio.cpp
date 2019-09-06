@@ -1,7 +1,7 @@
 /*
- * unit_test_uim.cpp
+ * unit_test_fileio.cpp
  *
- * This file provides unit test for uim.cpp/h.
+ * This file provides unit test for fileio.cpp/h.
  *
  * Author(s): Hang Yuan (hyuan211@gmail.com)
  * Tester(s): -

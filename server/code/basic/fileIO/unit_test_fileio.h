@@ -1,7 +1,7 @@
 /*
- * unit_test_uim.h
+ * unit_test_fileio.h
  *
- * This file provides unit test for uim.cpp/h.
+ * This file provides unit test for fileio.cpp/h.
  *
  * Author(s): Hang Yuan (hyuan211@gmail.com)
  * Tester(s): -
@@ -11,7 +11,7 @@
 #ifndef UNIT_TEST
 #define UNIT_TEST
 
-#include "uim.h"
+#include "fileio.h"
 #include "../util/emailError.h"
 
 #endif
